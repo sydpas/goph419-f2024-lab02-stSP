@@ -36,7 +36,7 @@ def spline_function(xd, yd, order):
         Increases in value.
     yd: array_like, float, shape of xd
     order: (optional) int
-        Possible values are 1, 2, and 3 with a default value of 3.
+        Possible values are 1, 2, and 3 with a default value of 3. 
 
     Returns:
     -----
