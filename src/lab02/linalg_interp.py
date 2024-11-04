@@ -1,3 +1,6 @@
+import numpy as np
+
+
 def gauss_iter_solve(A, b, x0, tol, alg):
     """
     Definition:
@@ -22,6 +25,24 @@ def gauss_iter_solve(A, b, x0, tol, alg):
     x: numpy.ndarray, shape of b.
     """
 
+    n = len(b)  # number of rows
+
+    x = np.asarray(x0)
+    if x.shape != b.shape:
+        raise ValueError("x0 must have the same shape as b.")
+
+    x_new = x.copy()  # x_new holds a copy of x
+
+    while np.linalg.norm(x_new - x) < tol:  # check for convergence of x_new compared to x
+        for k in range(n):
+            kp1 = (k + 1)
+            a_row = A[k, :]  # each k, a_row will be a new row from A.
+            # isolate k. b[k] is from b at row k. subtract previous values, subtract remaining values, divide by diag.
+            x_new[k] = (b[k] - a_row[:k] @ x_new[:k] - a_row[kp1:] @ x[kp1:]) / A[k, k]
+        x = x_new  # update x and return
+        return x
+
+
 # value errors in the first main paragraph under the parameters
 
 def spline_function(xd, yd, order):
@@ -36,7 +57,7 @@ def spline_function(xd, yd, order):
         Increases in value.
     yd: array_like, float, shape of xd
     order: (optional) int
-        Possible values are 1, 2, and 3 with a default value of 3. 
+        Possible values are 1, 2, and 3 with a default value of 3.
 
     Returns:
     -----
