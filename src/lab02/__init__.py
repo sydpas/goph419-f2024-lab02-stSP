@@ -1,3 +1,3 @@
-#from linalg_interp import (
-
-#)
+from .linalg_interp import (
+    gauss_iter_solve,
+)
