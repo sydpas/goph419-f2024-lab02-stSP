@@ -11,7 +11,7 @@ air_density = np.loadtxt("../data/air_density_vs_temp_eng_toolbox.txt", "float")
 
 def main():
     A = np.random.rand(3, 3)
-    b = np.random.rand(3, 1)
+    b = np.random.rand(3,1)
     x0 = np.random.rand(3, 1)
 
     print(f'A: {A}')
