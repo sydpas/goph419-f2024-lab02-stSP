@@ -26,24 +26,26 @@ def gauss_iter_solve(A, b, x0, tol, alg):
     """
 
     n = len(b)  # number of rows
+    max_iter = 1000  # maximum iterations to determine convergence
 
-    x = np.asarray(x0)
+    x = np.asarray(x0, dtype=float)  # converts x0 into an array if not already and stores in x
+    if A.shape[0] != A.shape[1]:
+        raise ValueError("Matrix A must be square.")
     if x.shape != b.shape:
         raise ValueError("x0 must have the same shape as b.")
+    if x.shape[0] != A.shape[0] and b.shape[0]:
+        raise ValueError("x0 must have the rows as A and b.")
 
-    x_new = x.copy()  # x_new holds a copy of x
-
-    while np.linalg.norm(x_new - x) < tol:  # check for convergence of x_new compared to x
+    for iteration in range(max_iter):
+        x_new = x.copy()  # x_new holds a copy of x
         for k in range(n):
-            kp1 = (k + 1)
             a_row = A[k, :]  # each k, a_row will be a new row from A.
+            kp1 = (k + 1)
             # isolate k. b[k] is from b at row k. subtract previous values, subtract remaining values, divide by diag.
-            x_new[k] = (b[k] - a_row[:k] @ x_new[:k] - a_row[kp1:] @ x[kp1:]) / A[k, k]
-        x = x_new  # update x and return
-        return x
+            x[k] = (b[k] - a_row[:k] @ x_new[:k] - a_row[kp1:] @ x[kp1:]) / A[k, k]
+        if np.linalg.norm(x_new - x) < tol:  # check for convergence of x_new compared to x
+            return x
 
-
-# value errors in the first main paragraph under the parameters
 
 def spline_function(xd, yd, order):
     """
