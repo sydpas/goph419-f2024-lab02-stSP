@@ -10,13 +10,13 @@ air_density = np.loadtxt("../data/air_density_vs_temp_eng_toolbox.txt", "float")
 #print(air_density)
 
 def main():
-    #A = np.random.rand(3, 3)
+    # A = np.random.rand(3, 3)
     A = np.array([[4, 0, 0],
             [2, 3, 0],
             [0, 4, 3]])
-    #b = np.random.rand(3, 1)
+    # b = np.random.rand(3, 1)
     b = np.array([1, 4, 3])
-    #x0 = np.random.rand(3, 1)
+    # x0 = np.random.rand(3, 1)
     x0 = np.array([1, 5, 6])
 
     print(f'A: {A}')
