@@ -35,11 +35,11 @@ def gauss_iter_solve(A, b, x0, tol, alg):
     n = len(b)  # number of rows
     max_iter = 2000  # maximum iterations to determine convergence
 
-    x = np.asarray(x0, dtype=float)  # converts x0 into an array if not already and stores in x
-    if A.shape[0] != A.shape[1]:
-        raise ValueError("Matrix A must be square.")
+    x = np.asarray(x0, dtype=float)  # stores x0 in x
     if x.shape != b.shape:
         raise ValueError("x0 must have the same shape as b.")
+    if A.shape[0] != A.shape[1]:
+        raise ValueError("Matrix A must be square.")
     if x.shape[0] != A.shape[0] and b.shape[0]:
         raise ValueError("x0 must have the rows as A and b.")
 
@@ -54,6 +54,8 @@ def gauss_iter_solve(A, b, x0, tol, alg):
                 x[k] = (b[k] - a_row[:k] @ x_new[:k] - a_row[kp1:] @ x[kp1:]) / A[k, k]
             if np.linalg.norm(x_new - x) < tol:  # check for convergence of x_new compared to x
                 return x
+        else:
+            raise RuntimeWarning('This system has not converged.')
     elif alg == 'jacobi':
         print(f'Algorithm used: Jacobi.')
         for iteration in range(max_iter):
@@ -66,7 +68,9 @@ def gauss_iter_solve(A, b, x0, tol, alg):
             if np.linalg.norm(x_new - x) < tol:  # check for convergence of x_new compared to x
                 return x_new
             x = x_new.copy()
-    elif alg != 'seidel' or 'jacobi':
+        else:
+            raise RuntimeWarning('This system has not converged.')
+    else:
         raise ValueError("Please use either Gauss-Seidel or Jacobi algorithm.")
 
 
@@ -90,6 +94,16 @@ def spline_function(xd, yd, order):
     """
     n = len(yd)-1
 
+    xd = np.array(xd)
+    yd = np.array(yd)
+
+    if len(xd) != len(yd):
+        raise ValueError('xd and yd do not have the same length.')
+    if len(np.unique(xd)) != len(xd):
+        raise ValueError('There are repeated vales in xd.')
+    if not np.all(np.diff(xd) > 0):
+        raise ValueError('The xd values are not in increasing order.')
+
     # linear spline
     if order == 1:
         slope_list = np.zeros(n)
@@ -97,9 +111,11 @@ def spline_function(xd, yd, order):
             ip1 = i + 1
             slope_list[i] = (yd[ip1] - yd[i]) / (xd[ip1] - xd[i])  # equation 24
         return slope_list
-
     # quadratic spline
-    if order == 2:
+    elif order == 2:
+    elif order == 3:
+    else:
+        raise ValueError('The order must be 1, 2, or 3.')
 
 
 
