@@ -25,12 +25,12 @@ def gauss_iter_solve(A, b, x0, tol, alg):
     x: numpy.ndarray, shape of b.
     """
 
-    A = np.asarray(A, dtype=float) # converting A into an array if not already.
-    b = np.asarray(b, dtype=float) # converting b into an array if not already.
+    A = np.asarray(A, dtype=float)  # converting A into an array if not already.
+    b = np.asarray(b, dtype=float)  # converting b into an array if not already.
     if x0 is None:
-        x0 = np.zeros_like(b, dtype=float) # initializing x0 if it is not given values.
+        x0 = np.zeros_like(b, dtype=float)  # initializing x0 if it is not given values.
     else:
-        x0 = np.asarray(x0, dtype=float) # converting x0 into an array if not already.
+        x0 = np.asarray(x0, dtype=float)  # converting x0 into an array if not already.
 
     n = len(b)  # number of rows
     max_iter = 2000  # maximum iterations to determine convergence
@@ -54,7 +54,8 @@ def gauss_iter_solve(A, b, x0, tol, alg):
                 x[k] = (b[k] - a_row[:k] @ x_new[:k] - a_row[kp1:] @ x[kp1:]) / A[k, k]
             if np.linalg.norm(x_new - x) < tol:  # check for convergence of x_new compared to x
                 return x
-            raise RuntimeWarning('This system has not converged.')
+         #   else:
+                # raise RuntimeWarning('This system has not converged.')
     elif alg == 'jacobi':
         print(f'Algorithm used: Jacobi.')
         for iteration in range(max_iter):
@@ -67,7 +68,7 @@ def gauss_iter_solve(A, b, x0, tol, alg):
             if np.linalg.norm(x_new - x) < tol:  # check for convergence of x_new compared to x
                 return x_new
             x = x_new.copy()
-            raise RuntimeWarning('This system has not converged.')
+            #raise RuntimeWarning('This system has not converged.')
     elif alg not in ['seidel', 'jacobi']:
         raise ValueError("Please use either Gauss-Seidel or Jacobi algorithm.")
 
@@ -104,8 +105,8 @@ def spline_function(xd, yd, order):
 
     # linear spline
     if order == 1:
-        slope_list = np.zeros(n)
-        for i in range(len(yd) - 1):
+        slope_list = [0] * (n)  # initializing with zeros
+        for i in range(len(xd) - 1):
             ip1 = i + 1
             slope_list[i] = (yd[ip1] - yd[i]) / (xd[ip1] - xd[i])  # equation 24
         return slope_list
@@ -122,8 +123,8 @@ def spline_function(xd, yd, order):
             A[i, i - 1] = xdiff[i - 1]  # 2nd derivative at previous point
             A[i, i] = 2 * (xdiff[i - 1] + xdiff[i])  # 2nd derivative at current point
             A[i, i + 1] = xdiff[i]  # 2nd derivative at next point
-            b[i] = 3 * (ydiff[i] / xdiff[i] - ydiff[i - 1] / xdiff[
-                i - 1])  # ensures the slope at the points is continuous
+            # ensures the slope at the points is continuous
+            b[i] = 3 * (ydiff[i] / xdiff[i] - ydiff[i - 1] / xdiff[i - 1])
 
         # clarify boundary conditions
         A[0, 0] = 1  # sets first 2nd derivative to 0
@@ -135,17 +136,22 @@ def spline_function(xd, yd, order):
         b_coef = (ydiff / xdiff) - xdiff * (c[1:] + 2 * c[:-1]) / 3
 
         # now we compute the spline
-        slope_list = np.zeros(n)
+        slope_list = []
 
         # determine where the point xi will fit into xd
         for xi in xd:
-            i = np.searchsorted(xd, xi) - 1)
-            if xi < xd[0] or xi > xd[0]:
-                raise ValueError('This xi is outside the range.')
+            i = np.searchsorted(xd, xi) - 1  # searching the interval
+            i = np.clip(i, 0, n - 1)  # make sure the i is within bounds
 
-    elif order == 3:
-    else:
-        raise ValueError('The order must be 1, 2, or 3.')
+            xdiff = xi - xd[i]  # the difference between xi and the LHS
 
+            yi = yd[i] + b_coef[i] * xdiff + c[i] * xdiff**2 + a_coef[i] * xdiff**3
+            slope_list.append(yi)
+
+        return slope_list
+
+    # elif order == 3:
+    # else:
+        #raise ValueError('The order must be 1, 2, or 3.')
 
 
