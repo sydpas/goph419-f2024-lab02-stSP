@@ -54,8 +54,8 @@ def gauss_iter_solve(A, b, x0, tol, alg):
                 x[k] = (b[k] - a_row[:k] @ x_new[:k] - a_row[kp1:] @ x[kp1:]) / A[k, k]
             if np.linalg.norm(x_new - x) < tol:  # check for convergence of x_new compared to x
                 return x
-         #   else:
-                # raise RuntimeWarning('This system has not converged.')
+            elif iteration > max_iter:
+                raise RuntimeWarning('This system has not converged.')
     elif alg == 'jacobi':
         print(f'Algorithm used: Jacobi.')
         for iteration in range(max_iter):
@@ -65,10 +65,11 @@ def gauss_iter_solve(A, b, x0, tol, alg):
                 kp1 = (k + 1)
                 # find x_new using the previous values
                 x_new[k] = (b[k] - np.dot(a_row[:k], x[:k]) - np.dot(a_row[kp1:], x[kp1:])) / A[k, k]
+            x = x_new.copy()
             if np.linalg.norm(x_new - x) < tol:  # check for convergence of x_new compared to x
                 return x_new
-            x = x_new.copy()
-            #raise RuntimeWarning('This system has not converged.')
+            elif iteration > max_iter:
+                raise RuntimeWarning('This system has not converged.')
     elif alg not in ['seidel', 'jacobi']:
         raise ValueError("Please use either Gauss-Seidel or Jacobi algorithm.")
 
@@ -149,9 +150,49 @@ def spline_function(xd, yd, order):
             slope_list.append(yi)
 
         return slope_list
+    elif order == 3:
+        xdiff = np.diff(xd)  # how far apart the xd values are
+        ydiff = np.diff(yd)  # the difference between yd values
 
-    # elif order == 3:
-    # else:
-        #raise ValueError('The order must be 1, 2, or 3.')
+        # now we set up the system of equations to find second derivatives c (continuity constraints)
+        A = np.zeros((n + 1, n + 1))
+        b = np.zeros(n + 1)
+
+        for i in range(1, n):
+            A[i, i - 1] = xdiff[i - 1]  # 2nd derivative at previous point
+            A[i, i] = 2 * (xdiff[i - 1] + xdiff[i])  # 2nd derivative at current point
+            A[i, i + 1] = xdiff[i]  # 2nd derivative at next point
+            # ensures the slope at the points is continuous
+            b[i] = 3 * (ydiff[i] / xdiff[i] - ydiff[i - 1] / xdiff[i - 1])
+
+        # clarify boundary conditions
+        A[0, 0] = 1  # sets first 2nd derivative to 0
+        A[-1, -1] = 1  # sets last 2nd derivative to 0
+
+        # solve for c and compute coefficients
+        c = np.linalg.solve(A, b)
+        a_coef = (c[1:] - c[:-1]) / (3 * xdiff)
+        b_coef = (ydiff / xdiff) - xdiff * (c[1:] + 2 * c[:-1]) / 3
+        c_coef = yd[:-1]  # original y values for each segment
+        d_coef = c[:-1]  # 2nd derivative at each interval
+
+        # now we compute the spline
+        slope_list = []
+
+        # determine where the point xi will fit into xd
+        for xi in xd:
+            i = np.searchsorted(xd, xi) - 1  # searching the interval
+            i = np.clip(i, 0, n - 1)  # make sure the i is within bounds
+
+            xdiff = xi - xd[i]  # the difference between xi and the LHS
+
+            # cubic spline equation
+            yi = (c_coef[i] + b_coef[i] * xdiff + d_coef * xdiff**2 + a_coef[i] * xdiff**3)
+            slope_list.append(yi)
+
+        return slope_list
+
+    else:
+        raise ValueError('The order must be 1, 2, or 3.')
 
 
