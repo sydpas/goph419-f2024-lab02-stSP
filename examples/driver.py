@@ -12,11 +12,11 @@ xd2, yd2 = a_d[:, 0], a_d[:, 1]
 
 
 def main():
-    A = np.array([[4, -1, 0, 0],
-            [-1, 4, -1, 0],
-            [0, -1, 6, -1],
-            [0, 0, -1, 3]])
-    b = np.array([15, 10, 10, 10])
+    A = np.array([[10, -2, 0, 0],
+            [-10, 4, -1, 0],
+            [0, -1, 9, -1],
+            [0, 0, -1, 9]])
+    b = np.array([15, 10, 20, 10])
     x0 = np.array([0, 0, 0, 0])
 
     print(f'A: {A}')
@@ -32,23 +32,30 @@ def main():
     print(f'Using water density data...')
 
     x_L_w = spline_function(xd1, yd1, 1)
-    x_L_w_rounded = [round(val, 4) for val in x_L_w]
+    x_L_w_rounded = np.round(x_L_w, 4)
     print(f'Linear: {x_L_w_rounded}')
 
     x_Q_w = spline_function(xd1, yd1, 2)
-    x_Q_w_rounded = [round(val, 4) for val in x_Q_w]
+    x_Q_w_rounded = np.round(x_Q_w, 4)
     print(f'Quadratic: {x_Q_w_rounded}')
+
+    x_C_w = spline_function(xd1, yd1, 3)
+    x_C_w_rounded = np.round(x_C_w, 4)
+    print(f'Cubic: {x_C_w_rounded}')
 
     print(f'Using air density data...')
 
     x_L_a = spline_function(xd2, yd2, 1)
-    x_L_a_rounded = [round(val, 4) for val in x_L_a]
+    x_L_a_rounded = np.round(x_L_a, 4)
     print(f'Linear: {x_L_a_rounded}')
 
     x_Q_a = spline_function(xd2, yd2, 2)
-    x_Q_a_rounded = [round(val, 4) for val in x_Q_a]
+    x_Q_a_rounded = np.round(x_Q_a, 4)
     print(f'Quadratic: {x_Q_a_rounded}')
 
+    x_C_a = spline_function(xd2, yd2, 3)
+    x_C_a_rounded = np.round(x_C_a, 4)
+    print(f'Cubic: {x_C_a_rounded}')
 
 
 if __name__ == "__main__":
