@@ -106,11 +106,15 @@ def spline_function(xd, yd, order):
 
     # linear spline
     if order == 1:
-        slope_list = [0] * (n)  # initializing with zeros
-        for i in range(len(xd) - 1):
-            ip1 = i + 1
-            slope_list[i] = (yd[ip1] - yd[i]) / (xd[ip1] - xd[i])  # equation 24
-        return slope_list
+        def linear_spline(xi):
+            for i in range(len(xd) - 1):
+                if xd[i] <= xi <= xd[i + 1]:
+                    ip1 = i + 1
+                    yi = (yd[ip1] - yd[i]) / (xd[ip1] - xd[i])  # equation 24
+                    return yi
+            raise ValueError("x is out of bounds of the xd values.")
+        return linear_spline
+
     # quadratic spline
     elif order == 2:
         xdiff = np.diff(xd)  # how far apart the xd values are
@@ -137,19 +141,15 @@ def spline_function(xd, yd, order):
         b_coef = (ydiff / xdiff) - xdiff * (c[1:] + 2 * c[:-1]) / 3
 
         # now we compute the spline
-        slope_list = []
-
-        # determine where the point xi will fit into xd
-        for xi in xd:
+        def quad_spline(xi):
             i = np.searchsorted(xd, xi) - 1  # searching the interval
             i = np.clip(i, 0, n - 1)  # make sure the i is within bounds
-
             xdiff = xi - xd[i]  # the difference between xi and the LHS
-
             yi = yd[i] + b_coef[i] * xdiff + c[i] * xdiff**2 + a_coef[i] * xdiff**3
-            slope_list.append(yi)
+            return yi
+        return quad_spline
 
-        return slope_list
+    # cubic spline
     elif order == 3:
         xdiff = np.diff(xd)  # how far apart the xd values are
         ydiff = np.diff(yd)  # the difference between yd values
@@ -177,22 +177,16 @@ def spline_function(xd, yd, order):
         d_coef = c[:-1]  # 2nd derivative at each interval
 
         # now we compute the spline
-        slope_list = []
-
-        # determine where the point xi will fit into xd
-        for xi in xd:
-            i = np.searchsorted(xd, xi) - 1  # searching the interval
-            i = np.clip(i, 0, n - 1)  # make sure the i is within bounds
-
-            xdiff = xi - xd[i]  # the difference between xi and the LHS
-
-            # cubic spline equation
-            yi = (c_coef[i] + b_coef[i] * xdiff + d_coef * xdiff**2 + a_coef[i] * xdiff**3)
-            slope_list.append(yi)
-
-        return slope_list
+        def cubic_spline(xi):
+            i = np.searchsorted(xd, xi) - 1
+            i = np.clip(i, 0, n - 1)
+            xdiff = xi - xd[i]
+            yi = (c_coef[i] + b_coef[i] * xdiff + d_coef[i] * xdiff ** 2 + a_coef[i] * xdiff ** 3)
+            return yi
+        return cubic_spline
 
     else:
-        raise ValueError('The order must be 1, 2, or 3.')
+        if order != [1, 2, 3]:
+            raise ValueError('The order must be 1, 2, or 3.')
 
 
