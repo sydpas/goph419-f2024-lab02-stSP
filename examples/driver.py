@@ -45,7 +45,7 @@ def main():
 
     # linear plot for water
     plt.subplot(3, 2, 1)  # plot 1
-    plt.plot(xd1, yd1, '-', color='darkblue', label='Data')
+    plt.plot(xd1, yd1, '-', color='blue', label='Data')
     plt.plot(x_linear_water, y_linear_water, 'o', color='green', markersize=2, label='Linear Spline')
     plt.xlabel('Temperature (°C)')
     plt.ylabel('Water Density (g/cm\u00b3)')
@@ -54,7 +54,7 @@ def main():
 
     # quad plot for water
     plt.subplot(3, 2, 3)  # plot 2
-    plt.plot(xd1, yd1, '--', color='darkgreen', label='Data')
+    plt.plot(xd1, yd1, '--', color='green', label='Data')
     plt.plot(x_quad_water, y_quad_water, 's', color='red', markersize=2, label='Quadratic Spline')
     plt.xlabel('Temperature (°C)')
     plt.ylabel('Water Density (g/cm\u00b3)')
@@ -63,7 +63,7 @@ def main():
 
     # cubic plot for water
     plt.subplot(3, 2, 5)  # plot 3
-    plt.plot(xd1, yd1, '-.', color='darkred', label='Data')
+    plt.plot(xd1, yd1, '-.', color='red', label='Data')
     plt.plot(x_cubic_water, y_cubic_water, '^', color='blue', markersize=2, label='Cubic Spline')
     plt.xlabel('Temperature (°C)')
     plt.ylabel('Water Density (g/cm\u00b3)')
