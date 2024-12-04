@@ -1,56 +1,90 @@
 import numpy as np
+import scipy as sp
+import matplotlib.pyplot as plt
 from src.lab02.linalg_interp import (
     gauss_iter_solve,
     spline_function,
 )
 
-w_d = np.loadtxt("../data/water_density_vs_temp_usgs.txt", "float")
-a_d = np.loadtxt("../data/air_density_vs_temp_eng_toolbox.txt", "float")
-
-xd1, yd1 = w_d[:, 0], w_d[:, 1]
-xd2, yd2 = a_d[:, 0], a_d[:, 1]
-
 
 def main():
-    A = np.array([[10, -2, 0, 0],
-            [-10, 4, -1, 0],
-            [0, -1, 9, -1],
-            [0, 0, -1, 9]])
-    b = np.array([15, 10, 20, 10])
-    x0 = np.array([0, 0, 0, 0])
+    # first we check gauss_iter_solve:
+    print(f'Testing gauss_iter_solve...')
 
-    print(f'A: {A}')
-    print(f'b: {b}')
-    print(f'x0: {x0}')
+    A = np.array([[10, 1, 1],
+                  [2, 10, 1],
+                  [2, 1, 10]])
+    b = np.array([12, 13, 14])
+    x0 = np.zeros(len(b))
 
-    x_s = gauss_iter_solve(A, b, x0, 1e-8,'seidel')
-    print(f'X: {x_s}')
+    # test 1: check that all x-producing algorithms match
+    print(f'Test one...')
 
-    x_j = gauss_iter_solve(A, b, x0, 1e-8,'jacobi')
-    print(f'X: {x_j}')
+    x_gauss_seidel = gauss_iter_solve(A, b, x0, 1e-8, 'seidel')
+    x_gauss_jacobi = gauss_iter_solve(A, b, x0, 1e-8, 'jacobi')
+    x_np = np.linalg.solve(A, b)
 
-    print(f'Using water density data...')
+    print(f'My seidel algorithm: {x_gauss_seidel}')
+    print(f'My jacobi algorithm: {x_gauss_jacobi}')
+    print(f'The NumPy algorithm: {x_np}')
 
-    x_L_w = spline_function(xd1, yd1, 1)
-    print(f'Linear: {x_L_w}')
+    # test 2: check that AA^-1 = I
+    print(f'Test two...')
 
-    x_Q_w = spline_function(xd1, yd1, 2)
-    print(f'Quadratic: {x_Q_w}')
+    # we will use the same A as above but a different b and x0
+    b = np.eye(A.shape[0])  # creates identity matrix with same rows and columns as A
+    x0 = np.zeros_like(b)
 
-    x_C_w = spline_function(xd1, yd1, 3)
-    print(f'Cubic: {x_C_w}')
+    A_inverse_seidel = gauss_iter_solve(A, b, x0, 1e-8, 'seidel')
+    A_inverse_jacobi = gauss_iter_solve(A, b, x0, 1e-8, 'jacobi')
+    A_inverse = np.linalg.inv(A)
 
-    print(f'Using air density data...')
+    print(f'My seidel algorithm: {A_inverse_seidel}')
+    print(f'My jacobi algorithm: {A_inverse_jacobi}')
+    print(f'The NumPy algorithm: {A_inverse}')
 
-    x_L_a = spline_function(xd2, yd2, 1)
-    print(f'Linear: {x_L_a}')
+    con_number = np.linalg.cond(A)
+    print(f'Condition number: {con_number}')
 
-    x_Q_a = spline_function(xd2, yd2, 2)
-    print(f'Quadratic: {x_Q_a}')
+    # now we check spline_function:
+    print(f'Testing spline_function...')
 
-    x_C_a = spline_function(xd2, yd2, 3)
-    print(f'Cubic: {x_C_a}')
+    # data i will use:
+    x = [0, 0.9, 2.4, 3, 4.6, 5, 6, 7, 8.4, 9]
+    y = [2, 9, 10, 20, 42, 57, 80, 93, 100, 137]
 
+    # test 1: check if linear, quad, and cubic return correct data
+    print(f'Test one...')
+
+    # my functions
+    linear_func = spline_function(x, y, 1)
+    quad_func = spline_function(x, y, 2)
+    cubic_func = spline_function(x, y, 3)
+
+    # scipy functions
+    linear_sp = sp.interpolate.interp1d(x, y, kind='linear')
+    quad_sp = sp.interpolate.interp1d(x, y, kind='quadratic')
+    cubic_sp = sp.interpolate.CubicSpline(x, y)
+
+    # now retrieving the values
+    x_test = np.linspace(0, 9, 5)
+
+    # using my functions
+    y_linear = [linear_func(xi) for xi in x_test]
+    y_quad = [quad_func(xi) for xi in x_test]
+    y_cubic = [cubic_func(xi) for xi in x_test]
+
+    # using scipy splines
+    y_linear_sp = linear_sp(x_test)
+    y_quad_sp = quad_sp(x_test)
+    y_cubic_sp = cubic_sp(x_test)
+
+    print(f'My linear spline: {y_linear}')
+    print(f'My quadratic spline: {y_quad}')
+    print(f'My cubic spline: {y_cubic}')
+    print(f'The SciPy linear spline: {y_linear_sp}')
+    print(f'The SciPy quadratic spline: {y_quad_sp}')
+    print(f'The SciPy cubic spline: {y_cubic_sp}')
 
 
 if __name__ == "__main__":
