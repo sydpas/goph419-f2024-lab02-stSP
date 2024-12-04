@@ -33,7 +33,7 @@ def gauss_iter_solve(A, b, x0, tol, alg):
         x0 = np.asarray(x0, dtype=float)  # converting x0 into an array if not already.
 
     n = len(b)  # number of rows
-    max_iter = 2000  # maximum iterations to determine convergence
+    max_iter = 5000  # maximum iterations to determine convergence
 
     x = np.asarray(x0, dtype=float)  # stores x0 in x
     if x.shape != b.shape:
@@ -44,7 +44,6 @@ def gauss_iter_solve(A, b, x0, tol, alg):
         raise ValueError("x0 must have the rows as A and b.")
 
     if alg == 'seidel':
-        print(f'Algorithm used: Gauss-Seidel.')
         for iteration in range(max_iter):
             x_new = x.copy()  # x_new holds a copy of x
             for k in range(n):
@@ -54,12 +53,10 @@ def gauss_iter_solve(A, b, x0, tol, alg):
                 x[k] = (b[k] - a_row[:k] @ x_new[:k] - a_row[kp1:] @ x[kp1:]) / A[k, k]
             if np.linalg.norm(x_new - x) < tol:  # check for convergence of x_new compared to x
                 return x
-            elif iteration > max_iter:
-                raise RuntimeWarning('This system has not converged.')
+        raise RuntimeWarning('This system has not converged.')
     elif alg == 'jacobi':
-        print(f'Algorithm used: Jacobi.')
         for iteration in range(max_iter):
-            x_new = x.copy()
+            x_new = np.zeros_like(x)
             for k in range(n):
                 a_row = A[k, :]
                 kp1 = (k + 1)
@@ -68,8 +65,8 @@ def gauss_iter_solve(A, b, x0, tol, alg):
             x = x_new.copy()
             if np.linalg.norm(x_new - x) < tol:  # check for convergence of x_new compared to x
                 return x_new
-            elif iteration > max_iter:
-                raise RuntimeWarning('This system has not converged.')
+            x = x_new.copy
+        raise RuntimeWarning('This system has not converged.')
     elif alg not in ['seidel', 'jacobi']:
         raise ValueError("Please use either Gauss-Seidel or Jacobi algorithm.")
 
@@ -110,7 +107,8 @@ def spline_function(xd, yd, order):
             for i in range(len(xd) - 1):
                 if xd[i] <= xi <= xd[i + 1]:
                     ip1 = i + 1
-                    yi = (yd[ip1] - yd[i]) / (xd[ip1] - xd[i])  # equation 24
+                    slope = (yd[ip1] - yd[i]) / (xd[ip1] - xd[i])
+                    yi = yd[i] + slope * (xi - xd[i])
                     return yi
             raise ValueError("x is out of bounds of the xd values.")
         return linear_spline
@@ -174,14 +172,13 @@ def spline_function(xd, yd, order):
         a_coef = (c[1:] - c[:-1]) / (3 * xdiff)
         b_coef = (ydiff / xdiff) - xdiff * (c[1:] + 2 * c[:-1]) / 3
         c_coef = yd[:-1]  # original y values for each segment
-        d_coef = c[:-1]  # 2nd derivative at each interval
 
         # now we compute the spline
         def cubic_spline(xi):
             i = np.searchsorted(xd, xi) - 1
             i = np.clip(i, 0, n - 1)
             xdiff = xi - xd[i]
-            yi = (c_coef[i] + b_coef[i] * xdiff + d_coef[i] * xdiff ** 2 + a_coef[i] * xdiff ** 3)
+            yi = c_coef[i] + b_coef[i] * xdiff + c[i] * xdiff ** 2 + a_coef[i] * xdiff ** 3
             return yi
         return cubic_spline
 
