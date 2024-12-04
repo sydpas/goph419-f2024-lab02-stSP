@@ -88,7 +88,7 @@ def main():
     # test 2: comparing my cubic spline with the univariate scipy function
     print(f'Test two...')
 
-    # i will just use my function i made
+    # i will use my function i made
     my_cubic_spline = spline_function(x, y, 3)
     # using the univariate function
     uni_spline = sp.interpolate.UnivariateSpline(x, y, s=0, ext='raise')
