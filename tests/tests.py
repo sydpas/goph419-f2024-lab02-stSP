@@ -1,6 +1,5 @@
 import numpy as np
 import scipy as sp
-import matplotlib.pyplot as plt
 from src.lab02.linalg_interp import (
     gauss_iter_solve,
     spline_function,
@@ -85,6 +84,23 @@ def main():
     print(f'The SciPy linear spline: {y_linear_sp}')
     print(f'The SciPy quadratic spline: {y_quad_sp}')
     print(f'The SciPy cubic spline: {y_cubic_sp}')
+
+    # test 2: comparing my cubic spline with the univariate scipy function
+    print(f'Test two...')
+
+    # i will just use my function i made
+    my_cubic_spline = spline_function(x, y, 3)
+    # using the univariate function
+    uni_spline = sp.interpolate.UnivariateSpline(x, y, s=0, ext='raise')
+
+    # retrieving the values
+    x_test = np.linspace(0, 9, 5)
+
+    my_cubic_test = [my_cubic_spline(xi) for xi in x_test]
+    uni_spline_test = uni_spline(x_test)
+
+    print(f'My cubic spline: {my_cubic_test}')
+    print(f'The Univariate Spline: {uni_spline_test}')
 
 
 if __name__ == "__main__":
