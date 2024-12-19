@@ -3,7 +3,8 @@
 
 ## General overview. 
 
--
+This lab is one component of an algorithm used in a partial differential equation solver for multi-phase fluid flow
+through granular material, and helps to access the impact of climate change on infrastructure in Northern regions. 
 
 ## How to clone the repository.
 
