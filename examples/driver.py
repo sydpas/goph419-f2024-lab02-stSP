@@ -17,28 +17,46 @@ def main():
     linear_spline = spline_function(xd1, yd1, 1)
     x_linear_water = np.linspace(min(xd1), max(xd1), 100)  # creating 100 equally spaced values
     y_linear_water = [linear_spline(x) for x in x_linear_water]
+    residuals = yd1 - np.array([linear_spline(xi) for xi in xd1])
+    residual_error = np.max(np.abs(residuals))
+    print(f"Max residual linear error: {residual_error}")
 
     quad_spline = spline_function(xd1, yd1, 2)
     x_quad_water = np.linspace(min(xd1), max(xd1), 100)
     y_quad_water = [quad_spline(x) for x in x_quad_water]
+    residuals = yd1 - np.array([quad_spline(xi) for xi in xd1])
+    residual_error = np.max(np.abs(residuals))
+    print(f"Max residual quadratic error: {residual_error}")
 
     cubic_spline = spline_function(xd1, yd1, 3)
     x_cubic_water = np.linspace(min(xd1), max(xd1), 100)
     y_cubic_water = [cubic_spline(x) for x in x_cubic_water]
+    residuals = yd1 - np.array([cubic_spline(xi) for xi in xd1])
+    residual_error = np.max(np.abs(residuals))
+    print(f"Max residual cubic error: {residual_error}")
 
     print(f'Using air density data...')
 
     linear_spline = spline_function(xd2, yd2, 1)
     x_linear_air = np.linspace(min(xd2), max(xd2), 100)  # creating 100 equally spaced values
     y_linear_air = [linear_spline(x) for x in x_linear_air]
+    residuals = yd2 - np.array([linear_spline(xi) for xi in xd2])
+    residual_error = np.max(np.abs(residuals))
+    print(f"Max residual linear error: {residual_error}")
 
     quad_spline = spline_function(xd2, yd2, 2)
     x_quad_air = np.linspace(min(xd2), max(xd2), 100)
     y_quad_air = [quad_spline(x) for x in x_quad_air]
+    residuals = yd2 - np.array([quad_spline(xi) for xi in xd2])
+    residual_error = np.max(np.abs(residuals))
+    print(f"Max residual quadratic error: {residual_error}")
 
     cubic_spline = spline_function(xd2, yd2, 3)
     x_cubic_air = np.linspace(min(xd2), max(xd2), 100)
     y_cubic_air = [cubic_spline(x) for x in x_cubic_air]
+    residuals = yd2 - np.array([cubic_spline(xi) for xi in xd2])
+    residual_error = np.max(np.abs(residuals))
+    print(f"Max residual cubic error: {residual_error}")
 
     # now we will plot all the points
     fig = plt.figure(figsize=(12, 8))  # width, height
